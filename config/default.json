@@ -1,0 +1,45 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 3006,
+    "baseDir": "/"
+  },
+  "logger": {
+    "level": "info"
+  },
+  "star-ws": {
+    "urlData": "http://localhost:3005",
+    "endpoints": {
+      "publishMetrics": "/publish/provider/:provider/node/:node",
+      "metrics": "/metrics",
+      "jsonDataAPI": "/upload/jsondata"
+    }
+  },
+  "data-feed": {
+    "url": "http://localhost:3001",
+    "endpoints": {
+      "codePageInfo": "/v1/code",
+      "commits": "/v1/commits",
+      "pulls": "/v1/pulls",
+      "issues": "/v1/issues",
+      "organizationMembers": "/v1/organization/members",
+      "userStats": "/v1/user/stats",
+      "comments": "/v1/comments"
+    },
+    "github": {
+      "rateLimit": {
+        "personalToken": ["edf4422e3a32a69cb851b4076bbd59f56ceec997"],
+        "minLimit": 50
+      }
+    },
+    "gitlab": {
+      "rateLimit": {
+        "personalToken": ["3p46Ss7APzGvTWtbAusm"]
+      }
+    }
+  },
+  "github": {
+    "url": "https://api.github.com",
+    "rateLimitPath": "/rate_limit"
+  }
+}
