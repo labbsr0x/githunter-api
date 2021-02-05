@@ -25,13 +25,14 @@ const publishMetrics = async (provider, node, data) => {
   }
 };
 
-const getMetrics = async (provider, node, params) => {
+const getMetrics = async (provider, node, body, params) => {
   let endPoint = starwsConfig.endpoints.metrics;
 
   try {
     const response = await httpClient.get({
       path: endPoint,
       params: { provider, node, ...params },
+      body,
     });
     logger.debug(`GET Request to get data intro AgroWS successfully!`);
     return response;

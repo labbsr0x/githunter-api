@@ -28,15 +28,24 @@ class Http {
     });
   }
 
-  get({ path, params, headers, isFullURL = false }) {
+  get({ path, params, headers, body, isFullURL = false }) {
     let url = this.service.defaults.url + path;
     if (isFullURL) {
       url = path;
     }
-    return this.service.get(url, {
-      params,
-      headers,
-    });
+    return this.service.get(
+      url,
+      body
+        ? {
+            params,
+            headers,
+            data: body,
+          }
+        : {
+            params,
+            headers,
+          },
+    );
   }
 
   patch(path, payload, callback) {
