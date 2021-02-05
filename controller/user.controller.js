@@ -14,9 +14,9 @@ const metrics = async (req, res) => {
     //    commits, comments, issues, pulls
 
     const source = [
-      { provider: 'github', node: 'issues' },
-      { provider: 'github', node: 'pulls' },
-      { provider: 'github', node: 'commits' },
+      { thing: '*', node: 'issues' },
+      { thing: '*', node: 'pulls' },
+      { thing: '*', node: 'commits' },
     ];
 
     const dataPromisses = [];
@@ -24,7 +24,7 @@ const metrics = async (req, res) => {
       try {
         dataPromisses.push(
           starws
-            .getMetrics(theSource.provider, theSource.node, {
+            .getMetrics(theSource.thing, theSource.node, {
               startDateTime,
               endDateTime,
             })
@@ -32,7 +32,7 @@ const metrics = async (req, res) => {
         );
       } catch (error) {
         logger.info(
-          `USER CONTROLLER: No content data for ${theSource.provider} - ${theSource.node}`,
+          `USER CONTROLLER: No content data for ${theSource.thing} - ${theSource.node}`,
         );
         logger.info('%j', error);
       }
@@ -52,7 +52,7 @@ const metrics = async (req, res) => {
         data = [...data, ...d.data.data];
       } else {
         logger.info(
-          `USER CONTROLLER: No content data for ${source[index].provider} - ${source[index].node}`,
+          `USER CONTROLLER: No content data for ${source[index].thing} - ${source[index].node}`,
         );
       }
     });
@@ -90,7 +90,7 @@ const metrics = async (req, res) => {
       .reduce((accumulator, currentValue) => accumulator + 1, 0);
 
     logger.info('Requesting User Stats on data-provider');
-    const userStats = await dataFeed.getUserStats({
+    const userStats = await dataFeed.getUserScore({
       login: author,
       provider: authorProvider,
     });
@@ -98,7 +98,11 @@ const metrics = async (req, res) => {
     const stats = {
       name: userStats.name ? userStats.name : '',
       login: userStats.login ? userStats.login : '',
+      id: userStats.id ? userStats.id : '',
       avatarUrl: userStats.avatarUrl ? userStats.avatarUrl : '',
+      followers: userStats.followers ? userStats.followers : [],
+      organizations: userStats.organizations ? userStats.organizations : [],
+      company: userStats.company ? userStats.company : '',
       contributedRepositories: userStats.contributedRepositories
         ? userStats.contributedRepositories
         : [],
@@ -109,7 +113,7 @@ const metrics = async (req, res) => {
         userStats.amount && userStats.amount.starsReceived
           ? userStats.amount.starsReceived
           : 0,
-      followers:
+      followersQuantity:
         userStats.amount && userStats.amount.followers
           ? userStats.amount.followers
           : 0,

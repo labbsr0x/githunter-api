@@ -171,6 +171,10 @@ const getUserStats = async params => {
   return sendGetToGithunter(githunterConfig.endpoints.userStats, params);
 };
 
+const getUserScore = async params => {
+  return sendGetToGithunter(githunterConfig.endpoints.userScore, params);
+};
+
 const getComments = async params => {
   const { ids } = params;
   delete params.ids;
@@ -186,5 +190,6 @@ module.exports = {
   getRepositoryIssues,
   getOrganizationMembers,
   getUserStats,
+  getUserScore,
   getComments,
 };
