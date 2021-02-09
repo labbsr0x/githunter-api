@@ -9,7 +9,7 @@ const httpClient = new HttpClient({
 });
 
 const getUsersLogin = async ({ provider, organization }) => {
-  let endPoint = dataProvider.endpoints.usersSimple;
+  const endPoint = dataProvider.endpoints.usersSimple;
 
   try {
     const response = await httpClient.get({

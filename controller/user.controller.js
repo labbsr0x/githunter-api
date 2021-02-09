@@ -1,4 +1,3 @@
-'use strict';
 const starws = require('../services/star-ws/controller');
 const logger = require('../infra/logger');
 const dataFeed = require('../services/data-feed/controller');
@@ -102,7 +101,7 @@ const metrics = async (req, res) => {
       contributedRepositories: userStats.contributedRepositories
         ? userStats.contributedRepositories
         : [],
-      commits: commitsAmount ? commitsAmount : 0,
+      commits: commitsAmount || 0,
       pullRequests: pullsAmount,
       issuesOpened: issuesAmount,
       starsReceived:

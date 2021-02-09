@@ -5,7 +5,14 @@
   "main": "githunter-api.js",
   "scripts": {
     "start": "node githunter-api.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix . --ext .js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run lint"
+    }
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +22,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "moment": "^2.29.1",
+    "qs": "^6.9.6",
     "route-parser": "0.0.5",
     "winston": "^3.3.3"
   },
@@ -25,7 +33,7 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "husky": "^4.2.5",
+    "husky": "^5.0.9",
     "prettier": "^2.0.5"
   }
 }

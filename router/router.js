@@ -1,5 +1,3 @@
-'use strict';
-
 const express = require('express');
 const metricsController = require('../controller/user.controller');
 const userSimpleController = require('../controller/userSimple.controller');
