@@ -57,7 +57,7 @@ const metrics = async (req, res) => {
     });
 
     const pullsAmount = data
-      .filter(i => i.type == 'pull')
+      .filter(i => i.type === 'pull')
       .filter(
         (arr, index, self) =>
           index ===
@@ -68,10 +68,10 @@ const metrics = async (req, res) => {
               t.name === arr.name,
           ),
       )
-      .reduce((accumulator, currentValue) => accumulator + 1, 0);
+      .reduce(accumulator => accumulator + 1, 0);
 
     const issuesAmount = data
-      .filter(i => i.type == 'issues')
+      .filter(i => i.type === 'issues')
       .filter(
         (arr, index, self) =>
           index ===
@@ -82,11 +82,11 @@ const metrics = async (req, res) => {
               t.name === arr.name,
           ),
       )
-      .reduce((accumulator, currentValue) => accumulator + 1, 0);
+      .reduce(accumulator => accumulator + 1, 0);
 
     const commitsAmount = data
-      .filter(i => i.type == 'commits')
-      .reduce((accumulator, currentValue) => accumulator + 1, 0);
+      .filter(i => i.type === 'commits')
+      .reduce(accumulator => accumulator + 1, 0);
 
     logger.info('Requesting User Stats on data-provider');
     const userStats = await dataFeed.getUserStats({

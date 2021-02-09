@@ -1,6 +1,6 @@
-const logger = require('../../infra/logger');
-
 const axios = require('axios').default;
+
+const logger = require('../../infra/logger');
 
 class Http {
   constructor({ url, headers, accessToken }) {
