@@ -1,4 +1,3 @@
-'use strict';
 const logger = require('../infra/logger');
 const dataProvider = require('../services/data-provider/controller');
 

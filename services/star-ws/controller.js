@@ -26,7 +26,7 @@ const publishMetrics = async (provider, node, data) => {
 };
 
 const getMetrics = async (provider, node, params) => {
-  let endPoint = starwsConfig.endpoints.metrics;
+  const endPoint = starwsConfig.endpoints.metrics;
 
   try {
     const response = await httpClient.get({

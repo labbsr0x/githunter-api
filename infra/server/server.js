@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable global-require */
 const express = require('express');
 const config = require('config');
 const logger = require('../logger');
@@ -17,7 +17,7 @@ const configureApp = app => {
   app.use(bodyParser.json({ limit: '10mb', extended: true }));
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-  var cors = require('cors');
+  const cors = require('cors');
   app.use(cors());
 };
 
@@ -25,7 +25,7 @@ const startApp = app => {
   const http = require('http');
   const server = http.createServer(app);
 
-  var appEnv = serverConfig;
+  const appEnv = serverConfig;
   server.listen(appEnv.port, appEnv.host, () => {
     const env = config.util.getEnv('NODE_ENV');
     logger.info(`Starting app for environment: ${env}`);
