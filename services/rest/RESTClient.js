@@ -33,19 +33,11 @@ class Http {
     if (isFullURL) {
       url = path;
     }
-    return this.service.get(
-      url,
-      body
-        ? {
-            params,
-            headers,
-            data: body,
-          }
-        : {
-            params,
-            headers,
-          },
-    );
+
+    const config = { params, headers };
+    if (body) config.data = body;
+
+    return this.service.get(url, config);
   }
 
   patch(path, payload, callback) {
