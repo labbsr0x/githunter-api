@@ -117,7 +117,6 @@ const metrics = async (req, res) => {
         login,
         provider,
         avatarUrl,
-        company,
         ownedRepositories,
         followers,
       } = userStats.data.shift();
@@ -128,7 +127,6 @@ const metrics = async (req, res) => {
         provider: provider || '',
         avatarUrl: avatarUrl || '',
         contributedRepositories: contributedRepositories || 0,
-        company: company || '',
         commits: commitsAmount || 0,
         pullRequests: pullsAmount,
         issuesOpened: issuesAmount,
