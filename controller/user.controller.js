@@ -1,6 +1,10 @@
+const moment = require('moment');
+const config = require('config');
 const starws = require('../services/star-ws/controller');
+const dataProvider = require('../services/data-provider/controller');
 const logger = require('../infra/logger');
-const dataFeed = require('../services/data-feed/controller');
+
+const quantityMonthlyPeriod = config.get('quantity-monthly-period');
 
 const metrics = async (req, res) => {
   try {
@@ -13,9 +17,9 @@ const metrics = async (req, res) => {
     //    commits, comments, issues, pulls
 
     const source = [
-      { provider: 'github', node: 'issues' },
-      { provider: 'github', node: 'pulls' },
-      { provider: 'github', node: 'commits' },
+      { thing: 'github', node: 'issues' },
+      { thing: 'github', node: 'pulls' },
+      { thing: 'github', node: 'commits' },
     ];
 
     const dataPromisses = [];
@@ -23,7 +27,7 @@ const metrics = async (req, res) => {
       try {
         dataPromisses.push(
           starws
-            .getMetrics(theSource.provider, theSource.node, {
+            .getMetrics(theSource.thing, theSource.node, {
               startDateTime,
               endDateTime,
             })
@@ -31,7 +35,7 @@ const metrics = async (req, res) => {
         );
       } catch (error) {
         logger.info(
-          `USER CONTROLLER: No content data for ${theSource.provider} - ${theSource.node}`,
+          `USER CONTROLLER: No content data for ${theSource.thing} - ${theSource.node}`,
         );
         logger.info('%j', error);
       }
@@ -51,7 +55,7 @@ const metrics = async (req, res) => {
         data = [...data, ...d.data.data];
       } else {
         logger.info(
-          `USER CONTROLLER: No content data for ${source[index].provider} - ${source[index].node}`,
+          `USER CONTROLLER: No content data for ${source[index].thing} - ${source[index].node}`,
         );
       }
     });
@@ -88,30 +92,55 @@ const metrics = async (req, res) => {
       .filter(i => i.type === 'commits')
       .reduce(accumulator => accumulator + 1, 0);
 
+    const contributedRepositories = data
+      .filter(
+        (arr, index, self) =>
+          index ===
+          self.findIndex(
+            t =>
+              t.author === author &&
+              t.owner === arr.owner &&
+              t.name === arr.name,
+          ),
+      )
+      .reduce(acc => acc + 1, 0);
+
     logger.info('Requesting User Stats on data-provider');
-    const userStats = await dataFeed.getUserStats({
+    const userStats = await dataProvider.getUserByLogin({
       login: author,
       provider: authorProvider,
     });
 
+    if (userStats.data?.length === 0) {
+      logger.info(`User ${author} not found in Data-Provider DB!`);
+      return res
+        .status(500)
+        .send({ message: `User ${author} not found in Data-Provider DB!` });
+    }
+
+    const {
+      name,
+      login,
+      provider,
+      avatarUrl,
+      company,
+      ownedRepositories,
+      followers,
+    } = userStats.data.shift();
+
     const stats = {
-      name: userStats.name ? userStats.name : '',
-      login: userStats.login ? userStats.login : '',
-      avatarUrl: userStats.avatarUrl ? userStats.avatarUrl : '',
-      contributedRepositories: userStats.contributedRepositories
-        ? userStats.contributedRepositories
-        : [],
+      name: name || '',
+      login: login || '',
+      provider: provider || '',
+      avatarUrl: avatarUrl || '',
+      contributedRepositories: contributedRepositories || 0,
+      company: company || '',
       commits: commitsAmount || 0,
       pullRequests: pullsAmount,
       issuesOpened: issuesAmount,
-      starsReceived:
-        userStats.amount && userStats.amount.starsReceived
-          ? userStats.amount.starsReceived
-          : 0,
-      followers:
-        userStats.amount && userStats.amount.followers
-          ? userStats.amount.followers
-          : 0,
+      // eslint-disable-next-line no-use-before-define
+      starsReceived: calculateStarsReceived(ownedRepositories),
+      followers: followers.length || 0,
     };
 
     res.status(200).send(stats);
@@ -121,6 +150,21 @@ const metrics = async (req, res) => {
       .status(500)
       .send({ message: error.message ? error.message : 'Unknow error' });
   }
+};
+
+const calculateStarsReceived = ownedRepositories => {
+  const stars = ownedRepositories
+    .map(
+      r =>
+        r.starsReceived /
+        (moment().diff(moment(r.createdAt), 'months', true) /
+          quantityMonthlyPeriod),
+    )
+    .reduce((acc, cur) => acc + cur);
+
+  return stars - Math.round(stars) !== 0
+    ? Math.round(stars) + 1
+    : Math.round(stars);
 };
 
 module.exports = metrics;
