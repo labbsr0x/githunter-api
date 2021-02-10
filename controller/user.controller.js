@@ -111,39 +111,39 @@ const metrics = async (req, res) => {
       provider: authorProvider,
     });
 
-    if (userStats.data?.length === 0) {
-      logger.info(`User ${author} not found in Data-Provider DB!`);
-      return res
-        .status(500)
-        .send({ message: `User ${author} not found in Data-Provider DB!` });
+    if (userStats.data?.length > 0) {
+      const {
+        name,
+        login,
+        provider,
+        avatarUrl,
+        company,
+        ownedRepositories,
+        followers,
+      } = userStats.data.shift();
+
+      const stats = {
+        name: name || '',
+        login: login || '',
+        provider: provider || '',
+        avatarUrl: avatarUrl || '',
+        contributedRepositories: contributedRepositories || 0,
+        company: company || '',
+        commits: commitsAmount || 0,
+        pullRequests: pullsAmount,
+        issuesOpened: issuesAmount,
+        // eslint-disable-next-line no-use-before-define
+        starsReceived: calculateStarsReceived(ownedRepositories),
+        followers: followers.length || 0,
+      };
+
+      res.status(200).send(stats);
     }
 
-    const {
-      name,
-      login,
-      provider,
-      avatarUrl,
-      company,
-      ownedRepositories,
-      followers,
-    } = userStats.data.shift();
-
-    const stats = {
-      name: name || '',
-      login: login || '',
-      provider: provider || '',
-      avatarUrl: avatarUrl || '',
-      contributedRepositories: contributedRepositories || 0,
-      company: company || '',
-      commits: commitsAmount || 0,
-      pullRequests: pullsAmount,
-      issuesOpened: issuesAmount,
-      // eslint-disable-next-line no-use-before-define
-      starsReceived: calculateStarsReceived(ownedRepositories),
-      followers: followers.length || 0,
-    };
-
-    res.status(200).send(stats);
+    logger.error(`User ${author} not found in Data-Provider DB!`);
+    res
+      .status(500)
+      .send({ message: `User ${author} not found in Data-Provider DB!` });
   } catch (error) {
     logger.error(error);
     res
