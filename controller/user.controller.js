@@ -136,12 +136,12 @@ const metrics = async (req, res) => {
       };
 
       res.status(200).send(stats);
+    } else {
+      logger.error(`User ${author} not found in Data-Provider DB!`);
+      res
+        .status(500)
+        .send({ message: `User ${author} not found in Data-Provider DB!` });
     }
-
-    logger.error(`User ${author} not found in Data-Provider DB!`);
-    res
-      .status(500)
-      .send({ message: `User ${author} not found in Data-Provider DB!` });
   } catch (error) {
     logger.error(error);
     res

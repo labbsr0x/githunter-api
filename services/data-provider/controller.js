@@ -8,7 +8,7 @@ const httpClient = new HttpClient({
   url: dataProvider.url,
 });
 
-const getUsersByOrganization = async ({ provider, organization }) => {
+const getUsersLogin = async ({ provider, organization }) => {
   const endPoint = dataProvider.endpoints.usersSimple;
 
   try {
@@ -56,6 +56,6 @@ const getUserByLogin = async ({ login, provider }) => {
 };
 
 module.exports = {
-  getUsersByOrganization,
+  getUsersLogin,
   getUserByLogin,
 };
