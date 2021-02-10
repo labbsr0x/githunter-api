@@ -1,7 +1,6 @@
-'use strict';
-
 const express = require('express');
 const metricsController = require('../controller/user.controller');
+const userSimpleController = require('../controller/userSimple.controller');
 
 const init = middlewares => {
   const router = express.Router();
@@ -11,6 +10,7 @@ const init = middlewares => {
   }
 
   router.get('/user', metricsController);
+  router.get('/user-simple', userSimpleController);
 
   return router;
 };

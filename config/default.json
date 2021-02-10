@@ -28,14 +28,24 @@
     },
     "github": {
       "rateLimit": {
-        "personalToken": ["edf4422e3a32a69cb851b4076bbd59f56ceec997"],
+        "personalToken": [
+          "edf4422e3a32a69cb851b4076bbd59f56ceec997"
+        ],
         "minLimit": 50
       }
     },
     "gitlab": {
       "rateLimit": {
-        "personalToken": ["3p46Ss7APzGvTWtbAusm"]
+        "personalToken": [
+          "3p46Ss7APzGvTWtbAusm"
+        ]
       }
+    }
+  },
+  "data-provider": {
+    "url": "http://localhost:3333",
+    "endpoints": {
+      "usersSimple": "/usersSimple"
     }
   },
   "github": {

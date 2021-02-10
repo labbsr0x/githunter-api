@@ -1,36 +1,36 @@
-const qs = require("qs");
-const moment = require("moment");
-const config = require("config");
-const Route = require("route-parser");
-const HttpClient = require("../rest/RESTClient");
-const logger = require("../../infra/logger");
+const qs = require('qs');
+const moment = require('moment');
+const config = require('config');
+const Route = require('route-parser');
+const HttpClient = require('../rest/RESTClient');
+const logger = require('../../infra/logger');
 
-const starwsConfig = config.get("star-ws");
+const starwsConfig = config.get('star-ws');
 const httpClient = new HttpClient({
   url: starwsConfig.urlData,
 });
 
 const auth = {
-  accessToken: "",
-  accessTokenGenerationTime: "", // last token generation time
-  expiresIn: "", // token expires in (cames from starws auth response)
+  accessToken: '',
+  accessTokenGenerationTime: '', // last token generation time
+  expiresIn: '', // token expires in (cames from starws auth response)
 };
 
 // TODO: Use percentage of expires_in
-const isTokenExpired = () => {
-  // Fist time for authentication
-  if (!auth.accessToken) return true;
+// const isTokenExpired = () => {
+//   // Fist time for authentication
+//   if (!auth.accessToken) return true;
 
-  const { renewTokenInMinute } = starwsConfig; // should renew token in minute
+//   const { renewTokenInMinute } = starwsConfig; // should renew token in minute
 
-  // Check if should renew token using expires date from startws
-  //      or from app config
-  let expires = auth.expiresIn - renewTokenInMinute;
-  expires = expires > 0 ? renewTokenInMinute : auth.expiresIn;
+//   // Check if should renew token using expires date from startws
+//   //      or from app config
+//   let expires = auth.expiresIn - renewTokenInMinute;
+//   expires = expires > 0 ? renewTokenInMinute : auth.expiresIn;
 
-  const expiresDatetime = moment().add(expires, "minutes");
-  return auth.accessTokenGenerationTime.isAfter(expiresDatetime);
-};
+//   const expiresDatetime = moment().add(expires, 'minutes');
+//   return auth.accessTokenGenerationTime.isAfter(expiresDatetime);
+// };
 
 const authenticate = async () => {
   try {
@@ -39,14 +39,14 @@ const authenticate = async () => {
     // }
 
     const headers = {
-      "content-type": "application/x-www-form-urlencoded",
-      "Content-Type": "application/x-www-form-urlencoded",
+      'content-type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/x-www-form-urlencoded',
     };
     const response = await httpClient.post(
       starwsConfig.endpoints.auth,
       qs.stringify(starwsConfig.authParams),
       headers,
-      starwsConfig.urlAuth
+      starwsConfig.urlAuth,
     );
 
     if (response && response.data) {
@@ -106,17 +106,19 @@ const metrics = async (provider, node, params) => {
   }
 };
 
-const saveJSONData = async (data) => {
+const saveJSONData = async data => {
   const isAuthenticate = await authenticate();
+  const endPoint = starwsConfig.endpoints.jsonDataAPI;
+
   if (!isAuthenticate) {
     return false;
   }
-  const endPoint = starwsConfig.endpoints.jsonDataAPI;
+
   try {
     const response = await httpClient.post(endPoint, data);
     if (response.status === 200 && response.data) {
       logger.info(
-        `POST Request to save JSON data in JSON-Data-API successfully!`
+        `POST Request to save JSON data in JSON-Data-API successfully!`,
       );
       return response.data;
     }
@@ -124,14 +126,13 @@ const saveJSONData = async (data) => {
     return false;
   } catch (e) {
     logger.error(
-      `POST Request to save JSON data in JSON-Data-API failure! ${e}`
+      `POST Request to save JSON data in JSON-Data-API failure! ${e}`,
     );
     return e.response;
   }
-  return false;
 };
 
-const getJSONData = async (url) => {
+const getJSONData = async url => {
   const isAuthenticate = await authenticate();
   if (!isAuthenticate) {
     return false;
@@ -141,7 +142,7 @@ const getJSONData = async (url) => {
     const response = await httpClient.get({ path: url, isFullURL: true });
     if (response.status === 200 && response.data) {
       logger.info(
-        `GET Request to get JSON data in JSON-Data-API successfully!`
+        `GET Request to get JSON data in JSON-Data-API successfully!`,
       );
       return response.data;
     }
