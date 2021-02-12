@@ -17,22 +17,20 @@ const getUsersLogin = async ({ provider, organization }) => {
       params: { provider, organization },
     });
 
-    logger.debug(
-      `GET Request by organization to get data into Data-Provider successfully!`,
-    );
+    logger.debug(`GET Request to get data into Data-Provider successfully!`);
 
     return response;
   } catch (e) {
-    logger.error(
-      `GET Request by organization to get data into Data-Provider: ${e.message}`,
-    );
+    logger.error(`GET Request get data into Data-Provider: ${e.message}`);
     logger.error(`%j`, e);
 
     throw e;
   }
 };
 
-const getUserByLogin = async ({ login, provider }) => {
+// Method: GET
+// Gets all the static information of a user by passing a login and provider
+const getUserInfo = async ({ login, provider }) => {
   const endPoint = `${dataProvider.endpoints.users}/${login}/provider/${provider}`;
 
   try {
@@ -41,13 +39,13 @@ const getUserByLogin = async ({ login, provider }) => {
     });
 
     logger.debug(
-      `GET Request by login to get data into Data-Provider successfully!`,
+      `GET Request by login and provider to get data into Data-Provider successfully!`,
     );
 
     return response;
   } catch (e) {
     logger.error(
-      `GET Request by login to get data into Data-Provider: ${e.message}`,
+      `GET Request by login and provider to get data into Data-Provider: ${e.message}`,
     );
     logger.error(`%j`, e);
 
@@ -57,5 +55,5 @@ const getUserByLogin = async ({ login, provider }) => {
 
 module.exports = {
   getUsersLogin,
-  getUserByLogin,
+  getUserInfo,
 };

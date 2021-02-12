@@ -3,6 +3,7 @@ const config = require('config');
 const starws = require('../services/star-ws/controller');
 const dataProvider = require('../services/data-provider/controller');
 const logger = require('../infra/logger');
+const { input } = require('../infra/logger');
 
 const quantityMonthlyPeriod = config.get('quantity-monthly-period');
 
@@ -106,7 +107,7 @@ const metrics = async (req, res) => {
       .reduce(acc => acc + 1, 0);
 
     logger.info('Requesting User Stats on data-provider');
-    const userStats = await dataProvider.getUserByLogin({
+    const userStats = await dataProvider.getUserInfo({
       login: author,
       provider: authorProvider,
     });
@@ -121,17 +122,28 @@ const metrics = async (req, res) => {
         followers,
       } = userStats.data.shift();
 
+      const stars = ownedRepositories
+        .map(
+          r =>
+            r.starsReceived /
+            (moment().diff(moment(r.createdAt), 'months', true) /
+              quantityMonthlyPeriod),
+        )
+        .reduce((acc, cur) => acc + cur);
+
+      const starsAmmount =
+        stars - Math.round(stars) !== 0 ? Math.round(stars) : stars;
+
       const stats = {
         name: name || '',
         login: login || '',
         provider: provider || '',
         avatarUrl: avatarUrl || '',
         contributedRepositories: contributedRepositories || 0,
-        commits: commitsAmount || 0,
+        commits: commitsAmount,
         pullRequests: pullsAmount,
         issuesOpened: issuesAmount,
-        // eslint-disable-next-line no-use-before-define
-        starsReceived: calculateStarsReceived(ownedRepositories),
+        starsReceived: starsAmmount,
         followers: followers.length || 0,
       };
 
@@ -148,21 +160,6 @@ const metrics = async (req, res) => {
       .status(500)
       .send({ message: error.message ? error.message : 'Unknow error' });
   }
-};
-
-const calculateStarsReceived = ownedRepositories => {
-  const stars = ownedRepositories
-    .map(
-      r =>
-        r.starsReceived /
-        (moment().diff(moment(r.createdAt), 'months', true) /
-          quantityMonthlyPeriod),
-    )
-    .reduce((acc, cur) => acc + cur);
-
-  return stars - Math.round(stars) !== 0
-    ? Math.round(stars) + 1
-    : Math.round(stars);
 };
 
 module.exports = metrics;
