@@ -28,15 +28,16 @@ class Http {
     });
   }
 
-  get({ path, params, headers, isFullURL = false }) {
+  get({ path, params, headers, body, isFullURL = false }) {
     let url = this.service.defaults.url + path;
     if (isFullURL) {
       url = path;
     }
-    return this.service.get(url, {
-      params,
-      headers,
-    });
+
+    const config = { params, headers };
+    if (body) config.data = body;
+
+    return this.service.get(url, config);
   }
 
   patch(path, payload, callback) {

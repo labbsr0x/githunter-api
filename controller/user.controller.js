@@ -12,10 +12,15 @@ const metrics = async (req, res) => {
     // Get data from different nodes
     //    commits, comments, issues, pulls
 
+    const filters = [];
+    filters.push({ author: `a:${author}` });
+    filters.push({ provider: authorProvider });
+    const body = JSON.stringify({ filters });
+
     const source = [
-      { provider: 'github', node: 'issues' },
-      { provider: 'github', node: 'pulls' },
-      { provider: 'github', node: 'commits' },
+      { thing: '*', node: 'issues' },
+      { thing: '*', node: 'pulls' },
+      { thing: '*', node: 'commits' },
     ];
 
     const dataPromisses = [];
@@ -23,7 +28,7 @@ const metrics = async (req, res) => {
       try {
         dataPromisses.push(
           starws
-            .getMetrics(theSource.provider, theSource.node, {
+            .getMetrics(theSource.thing, theSource.node, body, {
               startDateTime,
               endDateTime,
             })
@@ -31,7 +36,7 @@ const metrics = async (req, res) => {
         );
       } catch (error) {
         logger.info(
-          `USER CONTROLLER: No content data for ${theSource.provider} - ${theSource.node}`,
+          `USER CONTROLLER: No content data for ${theSource.thing} - ${theSource.node}`,
         );
         logger.info('%j', error);
       }
@@ -51,7 +56,7 @@ const metrics = async (req, res) => {
         data = [...data, ...d.data.data];
       } else {
         logger.info(
-          `USER CONTROLLER: No content data for ${source[index].provider} - ${source[index].node}`,
+          `USER CONTROLLER: No content data for ${source[index].thing} - ${source[index].node}`,
         );
       }
     });
