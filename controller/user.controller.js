@@ -17,10 +17,15 @@ const metrics = async (req, res) => {
     // Get data from different nodes
     //    commits, comments, issues, pulls
 
+    const filters = [];
+    filters.push({ author: `a:${author}` });
+    filters.push({ provider: authorProvider });
+    const body = JSON.stringify({ filters });
+
     const source = [
-      { thing: 'github', node: 'issues' },
-      { thing: 'github', node: 'pulls' },
-      { thing: 'github', node: 'commits' },
+      { thing: '*', node: 'issues' },
+      { thing: '*', node: 'pulls' },
+      { thing: '*', node: 'commits' },
     ];
 
     const dataPromisses = [];
@@ -28,7 +33,7 @@ const metrics = async (req, res) => {
       try {
         dataPromisses.push(
           starws
-            .getMetrics(theSource.thing, theSource.node, {
+            .getMetrics(theSource.thing, theSource.node, body, {
               startDateTime,
               endDateTime,
             })
