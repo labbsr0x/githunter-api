@@ -1,6 +1,11 @@
+const moment = require('moment');
+const config = require('config');
 const starws = require('../services/star-ws/controller');
+const dataProvider = require('../services/data-provider/controller');
 const logger = require('../infra/logger');
-const dataFeed = require('../services/data-feed/controller');
+const { input } = require('../infra/logger');
+
+const quantityMonthlyPeriod = config.get('quantity-monthly-period');
 
 const metrics = async (req, res) => {
   try {
@@ -93,33 +98,67 @@ const metrics = async (req, res) => {
       .filter(i => i.type === 'commits')
       .reduce(accumulator => accumulator + 1, 0);
 
+    const contributedRepositories = data
+      .filter(
+        (arr, index, self) =>
+          index ===
+          self.findIndex(
+            t =>
+              t.author === author &&
+              t.owner === arr.owner &&
+              t.name === arr.name,
+          ),
+      )
+      .reduce(acc => acc + 1, 0);
+
     logger.info('Requesting User Stats on data-provider');
-    const userStats = await dataFeed.getUserStats({
+    const userStats = await dataProvider.getUserInfo({
       login: author,
       provider: authorProvider,
     });
 
-    const stats = {
-      name: userStats.name ? userStats.name : '',
-      login: userStats.login ? userStats.login : '',
-      avatarUrl: userStats.avatarUrl ? userStats.avatarUrl : '',
-      contributedRepositories: userStats.contributedRepositories
-        ? userStats.contributedRepositories
-        : [],
-      commits: commitsAmount || 0,
-      pullRequests: pullsAmount,
-      issuesOpened: issuesAmount,
-      starsReceived:
-        userStats.amount && userStats.amount.starsReceived
-          ? userStats.amount.starsReceived
-          : 0,
-      followers:
-        userStats.amount && userStats.amount.followers
-          ? userStats.amount.followers
-          : 0,
-    };
+    if (userStats.data?.length > 0) {
+      const {
+        name,
+        login,
+        provider,
+        avatarUrl,
+        ownedRepositories,
+        followers,
+      } = userStats.data.shift();
 
-    res.status(200).send(stats);
+      const stars = ownedRepositories
+        .map(
+          r =>
+            r.starsReceived /
+            (moment().diff(moment(r.createdAt), 'months', true) /
+              quantityMonthlyPeriod),
+        )
+        .reduce((acc, cur) => acc + cur);
+
+      const starsAmmount =
+        stars - Math.round(stars) !== 0 ? Math.round(stars) : stars;
+
+      const stats = {
+        name: name || '',
+        login: login || '',
+        provider: provider || '',
+        avatarUrl: avatarUrl || '',
+        contributedRepositories: contributedRepositories || 0,
+        commits: commitsAmount,
+        pullRequests: pullsAmount,
+        issuesOpened: issuesAmount,
+        starsReceived: starsAmmount,
+        followers: followers.length || 0,
+      };
+
+      res.status(200).send(stats);
+    } else {
+      logger.error(`User ${author} not found in Data-Provider DB!`);
+      res
+        .status(500)
+        .send({ message: `User ${author} not found in Data-Provider DB!` });
+    }
   } catch (error) {
     logger.error(error);
     res

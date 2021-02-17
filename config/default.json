@@ -45,11 +45,13 @@
   "data-provider": {
     "url": "http://localhost:3333",
     "endpoints": {
-      "usersSimple": "/usersSimple"
+      "usersSimple": "/usersSimple",
+      "users": "/users"
     }
   },
   "github": {
     "url": "https://api.github.com",
     "rateLimitPath": "/rate_limit"
-  }
+  },
+  "quantity-monthly-period": 6
 }
