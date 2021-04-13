@@ -1,0 +1,11 @@
+{
+  "star-ws": {
+    "urlData": "http://localhost:3005"
+  },
+  "data-feed": {
+    "url": "https://githunter-data-feed-r3.labbs.com.br"
+  },
+  "data-provider": {
+    "url": "https://githunter-data-provider-r3.labbs.com.br"
+  }
+}

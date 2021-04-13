@@ -12,6 +12,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/githunter-api.js",
+            "env": {"NODE_ENV": "local-r3"},
             "outputCapture": "std"
         }
     ]

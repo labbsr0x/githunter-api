@@ -1,0 +1,11 @@
+{
+  "star-ws": {
+    "urlData": "http://starws:3005"
+  },
+  "data-feed": {
+    "url": "http://githunter-data-feed:3001"
+  },
+  "data-provider": {
+    "url": "http://data-provider:3333"
+  }
+}

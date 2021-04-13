@@ -23,9 +23,10 @@ const metrics = async (req, res) => {
     const body = JSON.stringify({ filters });
 
     const source = [
-      { thing: '*', node: 'issues' },
-      { thing: '*', node: 'pulls' },
-      { thing: '*', node: 'commits' },
+      { thing: '+', node: 'issues' },
+      { thing: '+', node: 'pulls' },
+      { thing: '+', node: 'commits' },
+      { thing: '+', node: 'comments' },
     ];
 
     const dataPromisses = [];
@@ -111,13 +112,27 @@ const metrics = async (req, res) => {
       )
       .reduce(acc => acc + 1, 0);
 
+    const commentsAmount = data
+      .filter(i => i.type === 'comments')
+      .filter(
+        (arr, index, self) =>
+          index ===
+          self.findIndex(
+            t =>
+              t.number === arr.number &&
+              t.owner === arr.owner &&
+              t.name === arr.name,
+          ),
+      )
+      .reduce(accumulator => accumulator + 1, 0);
+
     logger.info('Requesting User Stats on data-provider');
     const userStats = await dataProvider.getUserInfo({
       login: author,
       provider: authorProvider,
     });
 
-    if (userStats.data?.length > 0) {
+    if (userStats.data && userStats.data.length > 0) {
       const {
         name,
         login,
@@ -149,6 +164,7 @@ const metrics = async (req, res) => {
         pullRequests: pullsAmount,
         issuesOpened: issuesAmount,
         starsReceived: starsAmmount,
+        comments: commentsAmount,
         followers: followers.length || 0,
       };
 
